@@ -1,0 +1,18 @@
+{
+  "manifest_version": 3,
+  "name": "Context Tracker",
+  "version": "1.0",
+  "description": "Tracks website activity and sends it to the backend",
+  "permissions": ["activeTab", "scripting", "tabs"],
+  "background": {
+    "service_worker": "background.js"
+  },
+  "content_scripts": [
+    {
+      "matches": ["<all_urls>"],
+      "js": ["content.js"],
+      "run_at": "document_idle"
+    }
+  ],
+  "host_permissions": ["<all_urls>"]
+}
