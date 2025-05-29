@@ -1,6 +1,7 @@
 import sqlite3
 from models import EventInput
 from urllib.parse import urlparse
+from datetime import datetime
 
 DB_FILE = "events.db"
 
@@ -13,7 +14,9 @@ def init_db():
             tab_url TEXT,
             title TEXT,
             scroll_depth REAL,
-            category TEXT
+            duration_seconds INTEGER,
+            category TEXT,
+            timestamp TEXT
         )
     ''')
     conn.commit()
@@ -33,23 +36,44 @@ def categorize_url(url):
         return "other"
 
 def insert_event(event: EventInput):
-    category = categorize_url(event.tab_url)
+    category = event.category or categorize_url(event.tab_url)
+    timestamp = event.timestamp or datetime.utcnow().isoformat()
     conn = sqlite3.connect(DB_FILE)
     cursor = conn.cursor()
     cursor.execute('''
-        INSERT INTO events (tab_url, title, scroll_depth, category)
-        VALUES (?, ?, ?, ?)
-    ''', (event.tab_url, event.title, event.scroll_depth, category))
+        INSERT INTO events (tab_url, title, scroll_depth, duration_seconds, category, timestamp)
+        VALUES (?, ?, ?, ?, ?, ?)
+    ''', (
+        event.tab_url,
+        event.title,
+        event.scroll_depth,
+        event.duration_seconds,
+        category,
+        timestamp
+    ))
     conn.commit()
     conn.close()
 
 def fetch_events():
     conn = sqlite3.connect(DB_FILE)
     cursor = conn.cursor()
-    cursor.execute('SELECT tab_url, title, scroll_depth, category FROM events ORDER BY id DESC LIMIT 50')
+    cursor.execute('''
+        SELECT id, tab_url, title, scroll_depth, duration_seconds, category, timestamp
+        FROM events
+        ORDER BY id DESC
+        LIMIT 50
+    ''')
     rows = cursor.fetchall()
     conn.close()
     return [
-        {"tab_url": row[0], "title": row[1], "scroll_depth": row[2], "category": row[3]}
+        {
+            "id": row[0],
+            "tab_url": row[1],
+            "title": row[2],
+            "scroll_depth": row[3],
+            "duration_seconds": row[4],
+            "category": row[5],
+            "timestamp": row[6]
+        }
         for row in rows
     ]
