@@ -3,7 +3,9 @@ let startTime = Date.now();
 function getScrollDepth() {
   const scrolled = window.scrollY;
   const totalHeight = document.body.scrollHeight - window.innerHeight;
-  return totalHeight ? (scrolled / totalHeight) * 100 : 0;
+  const percentage= totalHeight ? (scrolled / totalHeight) * 100 : 0;
+  return Math.min(100,Math.max(0, percentage));
+  
 }
 
 function getCategoryFromURL(url) {
@@ -15,6 +17,7 @@ function getCategoryFromURL(url) {
   return "other";
 }
 
+
 function sendEventData() {
   const scrollDepth = getScrollDepth();
   const title = document.title;
@@ -23,6 +26,8 @@ function sendEventData() {
   const duration_seconds = Math.round((now - startTime) / 1000);
   const category = getCategoryFromURL(tabUrl);
   const timestamp = new Date().toISOString(); // or leave out and let backend assign
+
+  if (duration_seconds < 3) return; // Skip short visits
 
   fetch("http://localhost:8000/track-event", {
     method: "POST",

@@ -1,7 +1,10 @@
+import redis
+import json 
 from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel
 from db import init_db, insert_event, fetch_events
 from models import EventInput
+from fastapi.encoders import jsonable_encoder
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi import FastAPI
 
@@ -10,7 +13,7 @@ from fastapi import FastAPI
 
 app = FastAPI()
 
-
+r = redis.Redis(host='localhost', port=6379, db=0)
 
 app.add_middleware(
     CORSMiddleware,
@@ -26,8 +29,11 @@ def startup():
 @app.post("/track-event")
 async def track_event(event: EventInput):
     print(event.dict())
-    insert_event(event)
-    return {"status": "success", "message": "Event tracked."}
+    event_json = jsonable_encoder(event) #serialising datetime
+    r.lpush("event_queue", json.dumps(event_json))  # Push to queue
+    # insert_event(event)
+    # return {"status": "success", "message": "Event tracked."}
+    return {"status": "queued"}
 
 
 
