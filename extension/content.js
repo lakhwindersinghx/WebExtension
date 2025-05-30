@@ -41,7 +41,7 @@ function sendEventData() {
 }
 
 // Send every 30 seconds
-setInterval(sendEventData, 30000);
+setInterval(sendEventData, 10000);
 
 // Optional: send immediately when loaded
 sendEventData();
