@@ -2,7 +2,7 @@
 
 import redis
 import json
-from models.models import EventInput  # Pydantic validation
+from models.models import EventInput,AFKEventInput  # Pydantic validation
 from db import SessionLocal
 from models.db_models import Event  # SQLAlchemy model
 
