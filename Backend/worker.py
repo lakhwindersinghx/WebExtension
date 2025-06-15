@@ -14,6 +14,7 @@ def store_event(event_data: EventInput):
     db = SessionLocal()
     try:
         db_event = Event(
+            user_id=event_data.user_id,  
             tab_url=event_data.tab_url,
             title=event_data.title,
             scroll_depth=event_data.scroll_depth,
@@ -28,6 +29,7 @@ def store_event(event_data: EventInput):
         db.rollback()
     finally:
         db.close()
+
 
 while True:
     _, raw = r.brpop("event_queue")  # blocking pop from Redis

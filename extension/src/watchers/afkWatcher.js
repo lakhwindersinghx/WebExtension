@@ -1,3 +1,5 @@
+  const user_id = "testuser";
+  
   function sendAFKEvent(state) {
   fetch("http://localhost:8000/track-afk", {
     method: "POST",

@@ -29,6 +29,8 @@ app.add_middleware(
 
 @app.post("/track-event")
 async def track_event(event: EventInput):
+    
+    print(f"Received EventInput: {event}")
     try:
         event_json = jsonable_encoder(event)
         r.lpush("event_queue", json.dumps(event_json))  # Push to Redis queue
@@ -75,7 +77,9 @@ def get_afk_events(limit: int = 50):
 
 @app.get("/summaries/daily")
 def get_daily_summary(user_id: str = Query(...), day: date = Query(...)): #if we did not use date argument, we wouldve had to use date.today (default)
+    print(f"Querying for user_id={user_id} and day={day}")
     db = SessionLocal()
+    
     try:
         # Pull all events for the user on this day
         events = db.query(Event).filter(

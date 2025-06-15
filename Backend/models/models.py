@@ -3,6 +3,7 @@ from typing import Optional
 from datetime import datetime
 
 class EventInput(BaseModel):
+    user_id: Optional[str] = None
     tab_url: str
     title: str
     scroll_depth: float
@@ -11,6 +12,7 @@ class EventInput(BaseModel):
     timestamp: Optional[datetime] = None      # Optional if backend auto-generates it
 
 class AFKEventInput(BaseModel):
+    user_id: Optional[str] = None
     state: str  # "start" or "end"
     timestamp: datetime
 

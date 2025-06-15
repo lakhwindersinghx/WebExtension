@@ -1,3 +1,5 @@
+const user_id = "testuser";
+
 let startTime = Date.now();
 
 function getScrollDepth() {
@@ -31,6 +33,7 @@ function sendEventData() {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({
+      user_id,
       tab_url: tabUrl,
       title,
       scroll_depth: scrollDepth,
@@ -44,6 +47,25 @@ function sendEventData() {
 }
 
 export function startWebsiteTracking() {
-  setInterval(sendEventData, 10000); // 10s
-  sendEventData(); // Immediately
+  let previousUrl = window.location.href;
+  let previousTitle = document.title;
+  let previousScroll = getScrollDepth();
+
+  setInterval(() => {
+    const currentUrl = window.location.href;
+    const currentTitle = document.title;
+    const currentScroll = getScrollDepth();
+
+    if (
+      currentUrl !== previousUrl ||
+      currentTitle !== previousTitle ||
+      Math.abs(currentScroll - previousScroll) > 10
+    ) {
+      sendEventData();
+      previousUrl = currentUrl;
+      previousTitle = currentTitle;
+      previousScroll = currentScroll;
+    }
+  }, 10000);
 }
+
